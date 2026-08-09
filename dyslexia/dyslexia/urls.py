@@ -22,4 +22,5 @@ urlpatterns = [
     re_path(r'^auth/', include('djoser.urls')),
     re_path(r'^auth/', include('djoser.urls.jwt')),
     path('user_settings/', include('user_settings.urls')),
+    path('documents/', include('documents.urls')),
 ]
