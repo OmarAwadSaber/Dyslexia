@@ -1,4 +1,7 @@
 from rest_framework import serializers
+from .models import Document
 
 class DocumentSerializer(serializers.Serializer):
-    pass
+    class Meta:
+        model = Document
+        fields = ['id', 'source', 'raw_text', 'extracted_at']
