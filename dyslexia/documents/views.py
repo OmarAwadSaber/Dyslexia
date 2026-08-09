@@ -12,3 +12,10 @@ class DocumentListView(generics.ListCreateAPIView):
     
     def get_queryset(self):
         return get_object_or_404(Document, user=self.request.user).all()
+    
+class DocumentDetailView(generics.RetrieveDestroyAPIView):
+    serializer_class = DocumentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return get_object_or_404(Document, user=self.request.user).all()
