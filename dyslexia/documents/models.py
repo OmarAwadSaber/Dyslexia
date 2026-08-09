@@ -18,3 +18,10 @@ class Document(models.Model):
     source = models.CharField(max_length=20, choices=SOURCE.CHOICES)
     raw_text = models.TextField()
     extracted_at = models.DateTimeField(auto_now_add=True)
+    
+class  ProcessedText(models.Model):
+    document = models.ForeignKey(Document, on_delete=models.CASCADE)
+    simplified_text = models.TextField()
+    difficulty_map = models.JSONField()
+    explanation_text = models.TextField()
+    processed_at = models.DateTimeField(auto_now_add=True)
