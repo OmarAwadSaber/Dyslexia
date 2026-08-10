@@ -1,4 +1,5 @@
 import json
+import logging
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
@@ -15,6 +16,9 @@ from .serializers import (
     DocumentSerializer,
     DocumentSimplifiedTextSerializer,
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 class NLPServiceError(APIException):
@@ -62,6 +66,7 @@ class DocumentListCreateView(generics.ListCreateAPIView):
 
     def _predict_simplified_text(self, raw_text):
         if not settings.NLP_URL:
+            logger.error('NLP prediction skipped because NLP_URL is not configured.')
             raise NLPServiceError('NLP_URL is not configured.')
 
         endpoint = f"{settings.NLP_URL.rstrip('/')}/predict"
@@ -77,18 +82,22 @@ class DocumentListCreateView(generics.ListCreateAPIView):
             with urlopen(request, timeout=30) as response:
                 response_body = response.read().decode('utf-8')
         except (HTTPError, URLError, TimeoutError, ValueError) as exc:
+            logger.exception('NLP request failed for endpoint %s', endpoint)
             raise NLPServiceError() from exc
 
         try:
             response_data = json.loads(response_body)
         except json.JSONDecodeError as exc:
+            logger.exception('NLP service returned invalid JSON from endpoint %s', endpoint)
             raise NLPServiceError('NLP service returned invalid JSON.') from exc
 
         if not isinstance(response_data, dict):
+            logger.error('NLP service response from %s was not a JSON object: %r', endpoint, response_data)
             raise NLPServiceError('NLP service response did not include simplified text.')
 
         simplified_text = response_data.get('simplified_text')
         if not simplified_text:
+            logger.error('NLP service response from %s did not include simplified_text: %r', endpoint, response_data)
             raise NLPServiceError('NLP service response did not include simplified text.')
 
         difficult_words = response_data.get('words') or response_data.get('difficulty_map') or []
