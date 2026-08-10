@@ -1,0 +1,10 @@
+{
+  "name": "Dyslexia Reading Assistant",
+  "description": "Mobile application and accessibility platform for people with dyslexia, converting scanned/uploaded documents into simplified, accessible text using AI.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
