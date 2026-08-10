@@ -1,5 +1,5 @@
 import json
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -32,15 +32,17 @@ class DocumentPostTests(TestCase):
 		self.client = APIClient()
 		self.client.force_authenticate(user=self.user)
 
-	@patch('documents.views.urlopen')
-	def test_post_returns_simplified_text_from_nlp_service(self, mock_urlopen):
-		mock_urlopen.return_value = _MockNLPResponse(
+	@patch('documents.views.build_opener')
+	def test_post_returns_simplified_text_from_nlp_service(self, mock_build_opener):
+		mock_opener = MagicMock()
+		mock_opener.open.return_value = _MockNLPResponse(
 			{
 				'simplified_text': 'easy text',
 				'words': ['hard', 'text'],
 				'explanation_text': 'Explanation',
 			}
 		)
+		mock_build_opener.return_value = mock_opener
 
 		response = self.client.post(
 			'/documents/',

@@ -1,7 +1,7 @@
 import json
 import logging
 from urllib.error import HTTPError, URLError
-from urllib.request import Request, urlopen
+from urllib.request import ProxyHandler, Request, build_opener
 
 from django.conf import settings
 from django.db import transaction
@@ -77,9 +77,10 @@ class DocumentListCreateView(generics.ListCreateAPIView):
             headers={'Content-Type': 'application/json'},
             method='POST',
         )
+        opener = build_opener(ProxyHandler({}))
 
         try:
-            with urlopen(request, timeout=30) as response:
+            with opener.open(request, timeout=30) as response:
                 response_body = response.read().decode('utf-8')
         except (HTTPError, URLError, TimeoutError, ValueError) as exc:
             logger.exception('NLP request failed for endpoint %s', endpoint)
